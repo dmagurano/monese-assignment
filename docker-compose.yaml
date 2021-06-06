@@ -1,0 +1,9 @@
+version: "2.4"
+services:
+  db:
+    container_name: "monesechallenge_db"
+    build:
+      context: ./db/docker
+      dockerfile: Dockerfile
+    ports:
+      - "4567:1433"

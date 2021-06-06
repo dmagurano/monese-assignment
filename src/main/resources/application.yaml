@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://localhost:4567;DatabaseName=MoneseAssignment;applicationName=monese-assignment
+    username: sa
+    password: P@55w0rd
+  liquibase:
+    change-log: db/db.changelog-master.xml
+    drop-first: true
+  application:
+    name: monese-assignment
