@@ -12,4 +12,12 @@ public class Account {
 
     private int id;
     private BigDecimal balance;
+
+    public void addToBalance(BigDecimal amount) {
+        balance = balance.add(amount);
+    }
+
+    public void subtractFromBalance(BigDecimal amount) {
+        balance = balance.subtract(amount);
+    }
 }

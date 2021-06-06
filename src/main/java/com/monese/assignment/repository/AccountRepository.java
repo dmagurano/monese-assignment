@@ -26,4 +26,15 @@ public class AccountRepository {
                                                rs.getBigDecimal("Balance")
                                            ));
     }
+
+    public void update(Account account) {
+        SqlParameterSource params = new MapSqlParameterSource()
+            .addValue("accountId", account.getId())
+            .addValue("balance", account.getBalance());
+
+        jdbcTemplate.update("UPDATE Account         " +
+                                "SET Balance = :balance " +
+                                "WHERE Id = :accountId  ",
+                            params);
+    }
 }

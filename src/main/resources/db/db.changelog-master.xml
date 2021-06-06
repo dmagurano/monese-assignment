@@ -9,7 +9,7 @@
             <column name="Id" type="int" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="Balance" type="DECIMAL(19, 4)">
+            <column name="Balance" type="DECIMAL(19, 2)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -20,6 +20,35 @@
         <insert tableName="Account">
             <column name="Balance" value="300"/>
         </insert>
+    </changeSet>
+
+    <changeSet id="2" author="daniele.magurano">
+        <createTable tableName="Transaction">
+            <column name="Id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="Source" type="int">
+                <constraints nullable="false" />
+            </column>
+            <column name="Destination" type="int">
+                <constraints nullable="false" />
+            </column>
+            <column name="Amount" type="DECIMAL(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="Source"
+            baseTableName="Transaction"
+            constraintName="FK_Transaction_Source_Account"
+            referencedColumnNames="Id"
+            referencedTableName="Account"/>
+
+        <addForeignKeyConstraint baseColumnNames="Destination"
+            baseTableName="Transaction"
+            constraintName="FK_Transaction_Destination_Account"
+            referencedColumnNames="Id"
+            referencedTableName="Account"/>
     </changeSet>
 
 </databaseChangeLog>
