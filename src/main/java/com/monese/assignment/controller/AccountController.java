@@ -1,7 +1,8 @@
 package com.monese.assignment.controller;
 
-import com.monese.assignment.entity.Account;
-import com.monese.assignment.repository.AccountRepository;
+import com.monese.assignment.dto.AccountResponse;
+import com.monese.assignment.entity.AccountSummary;
+import com.monese.assignment.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AccountController {
 
-    private final AccountRepository accountRepository;
+    private final AccountService accountService;
 
     @GetMapping(value = "/account/{accountId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAccount(@PathVariable("accountId") int accountId) {
 
-        Account account = accountRepository.findById(accountId);
+        AccountSummary account = accountService.getSummaryById(accountId);
 
-        return ResponseEntity.ok(account);
+        return ResponseEntity.ok(AccountResponse.fromSummary(account));
     }
 }

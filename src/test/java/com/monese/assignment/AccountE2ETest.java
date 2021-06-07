@@ -3,7 +3,7 @@ package com.monese.assignment;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.comparesEqualTo;
 
-import com.monese.assignment.entity.Account;
+import com.monese.assignment.dto.AccountResponse;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +20,13 @@ class AccountE2ETest {
 
 	@Test
 	void canGetAccountsById() {
-		Account account = webTestClient
+		AccountResponse account = webTestClient
 			.get()
 			.uri("account/{accountId}", 1)
 			.exchange()
 			.expectStatus()
 			.isOk()
-			.returnResult(Account.class)
+			.returnResult(AccountResponse.class)
 			.getResponseBody().blockFirst();
 
 		assertThat(account.getBalance(), comparesEqualTo(BigDecimal.valueOf(200)));

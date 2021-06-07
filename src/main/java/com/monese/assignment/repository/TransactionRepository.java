@@ -3,6 +3,7 @@ package com.monese.assignment.repository;
 import com.monese.assignment.entity.Transaction;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -35,5 +36,24 @@ public class TransactionRepository {
         transaction.setTimestamp(timestamp);
 
         return transaction;
+    }
+
+    public List<Transaction> getAccountTransactions(int accountId) {
+        SqlParameterSource params = new MapSqlParameterSource()
+            .addValue("accountId", accountId);
+
+        return jdbcTemplate.query("SELECT Id, Source, Destination, Amount, Timestamp " +
+                                      "FROM [Transaction] t " +
+                                      "WHERE Source = :accountId " +
+                                      "OR Destination = :accountId",
+                                  params,
+                                  (rs, i) -> new Transaction(
+                                      rs.getInt("Id"),
+                                      rs.getInt("Source"),
+                                      rs.getInt("Destination"),
+                                      rs.getBigDecimal("Amount"),
+                                      rs.getTimestamp("Timestamp").toLocalDateTime()
+                                  )
+        );
     }
 }

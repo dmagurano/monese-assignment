@@ -1,13 +1,16 @@
 package com.monese.assignment;
 
+import static org.exparity.hamcrest.date.LocalDateTimeMatchers.within;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.comparesEqualTo;
+import static org.hamcrest.Matchers.equalTo;
 
-import com.monese.assignment.entity.Account;
-import com.monese.assignment.entity.AccountSummary;
-import com.monese.assignment.entity.AccountTransaction;
+import com.monese.assignment.dto.AccountResponse;
+import com.monese.assignment.dto.AccountTransaction;
+import com.monese.assignment.dto.TransactionRequest;
 import com.monese.assignment.entity.Transaction;
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -30,18 +33,39 @@ public class TransactionE2ETest {
 
     @Test
     void canTransferFundsBetweenTwoAccounts() {
-        BigDecimal sourceOriginalBalance = getAccountBalance(SOURCE_ACCOUNT);
-        BigDecimal destinationOriginalBalance = getAccountBalance(DESTINATION_ACCOUNT);
+        AccountResponse originalSourceAccount = getAccount(SOURCE_ACCOUNT);
+        AccountResponse originalDestinationAccount = getAccount(DESTINATION_ACCOUNT);
 
-        Transaction transaction = new Transaction(SOURCE_ACCOUNT, DESTINATION_ACCOUNT, TRANSACTION_AMOUNT);
+        TransactionRequest request = new TransactionRequest(SOURCE_ACCOUNT, DESTINATION_ACCOUNT, TRANSACTION_AMOUNT);
 
-        executeTransaction(transaction);
+        Transaction transaction = executeTransaction(request);
 
-        BigDecimal sourceFinalBalance = getAccountBalance(SOURCE_ACCOUNT);
-        BigDecimal destinationFinalBalance = getAccountBalance(DESTINATION_ACCOUNT);
+        AccountResponse finalSourceAccount = getAccount(SOURCE_ACCOUNT);
+        AccountResponse finalDestinationAccount = getAccount(DESTINATION_ACCOUNT);
 
-        assertThat(sourceFinalBalance, comparesEqualTo(sourceOriginalBalance.subtract(TRANSACTION_AMOUNT)));
-        assertThat(destinationFinalBalance, comparesEqualTo(destinationOriginalBalance.add(TRANSACTION_AMOUNT)));
+        assertThat(finalSourceAccount.getBalance(), comparesEqualTo(originalSourceAccount.getBalance().subtract(TRANSACTION_AMOUNT)));
+        assertThat(finalDestinationAccount.getBalance(), comparesEqualTo(originalDestinationAccount.getBalance().add(TRANSACTION_AMOUNT)));
+
+        assertTransactionPresentInSourceAccount(transaction, finalSourceAccount);
+        assertTransactionPresentInDestinationAccount(transaction, finalDestinationAccount);
+    }
+
+    private void assertTransactionPresentInDestinationAccount(Transaction transaction, AccountResponse finalDestinationAccount) {
+        AccountTransaction destinationAccountTransaction = finalDestinationAccount.getTransactions().get(0);
+
+        assertThat(destinationAccountTransaction.getTransactionId(), equalTo(transaction.getId()));
+        assertThat(destinationAccountTransaction.getForeignAccount(), equalTo(transaction.getSourceAccount()));
+        assertThat(destinationAccountTransaction.getAmount(), comparesEqualTo(transaction.getAmount()));
+        assertThat(destinationAccountTransaction.getTimestamp(), within(1, ChronoUnit.SECONDS, transaction.getTimestamp()));
+    }
+
+    private void assertTransactionPresentInSourceAccount(Transaction transaction, AccountResponse finalSourceAccount) {
+        AccountTransaction sourceAccountTransaction = finalSourceAccount.getTransactions().get(0);
+
+        assertThat(sourceAccountTransaction.getTransactionId(), equalTo(transaction.getId()));
+        assertThat(sourceAccountTransaction.getForeignAccount(), equalTo(transaction.getDestinationAccount()));
+        assertThat(sourceAccountTransaction.getAmount(), comparesEqualTo(transaction.getAmount().negate()));
+        assertThat(sourceAccountTransaction.getTimestamp(), within(1, ChronoUnit.SECONDS, transaction.getTimestamp()));
     }
 
     @Test
@@ -70,7 +94,7 @@ public class TransactionE2ETest {
             .isBadRequest();
     }
 
-    private Transaction executeTransaction(Transaction transaction) {
+    private Transaction executeTransaction(TransactionRequest transaction) {
         return webTestClient
             .post()
             .uri("/transaction")
@@ -82,16 +106,14 @@ public class TransactionE2ETest {
             .getResponseBody().blockFirst();
     }
 
-    private BigDecimal getAccountBalance(int accountId) {
-        Account account = webTestClient
+    private AccountResponse getAccount(int accountId) {
+        return webTestClient
             .get()
             .uri("account/{accountId}", accountId)
             .exchange()
             .expectStatus()
             .isOk()
-            .returnResult(Account.class)
+            .returnResult(AccountResponse.class)
             .getResponseBody().blockFirst();
-
-        return account.getBalance();
     }
 }
