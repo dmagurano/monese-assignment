@@ -9,7 +9,7 @@
             <column name="Id" type="int" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="Balance" type="DECIMAL(19, 2)">
+            <column name="Balance" type="decimal(19, 2)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -33,7 +33,10 @@
             <column name="Destination" type="int">
                 <constraints nullable="false" />
             </column>
-            <column name="Amount" type="DECIMAL(19, 2)">
+            <column name="Amount" type="decimal(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Timestamp" type="datetime">
                 <constraints nullable="false"/>
             </column>
         </createTable>

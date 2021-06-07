@@ -18,7 +18,11 @@ public class TransactionService {
     private final AccountRepository accountRepository;
 
     @Transactional
-    public Integer createTransaction(Transaction transaction) throws InsufficientFundsException {
+    public Transaction createTransaction(Transaction transaction) {
+        if (transaction.getSourceAccount() == transaction.getDestinationAccount()) {
+            throw new IllegalArgumentException("Transactions to the same account are not allowed.");
+        }
+
         Account source = accountRepository.findById(transaction.getSourceAccount());
         BigDecimal transactionAmount = transaction.getAmount();
 

@@ -1,7 +1,7 @@
 package com.monese.assignment;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.comparesEqualTo;
 
 import com.monese.assignment.entity.Account;
 import java.math.BigDecimal;
@@ -29,7 +29,17 @@ class AccountE2ETest {
 			.returnResult(Account.class)
 			.getResponseBody().blockFirst();
 
-		assertThat(account.getBalance().compareTo(BigDecimal.valueOf(200)), equalTo(0));
+		assertThat(account.getBalance(), comparesEqualTo(BigDecimal.valueOf(200)));
+	}
+
+	@Test
+	void returnBadRequestWhenAccountDoesntExist() {
+		webTestClient
+			.get()
+			.uri("account/{accountId}", 9)
+			.exchange()
+			.expectStatus()
+			.isBadRequest();
 	}
 }
 
