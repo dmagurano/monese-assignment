@@ -57,9 +57,9 @@ you can send an `HTTP GET` request to the following endpoint:
   you can send a `POST` request to the `/transaction` endpoint, with the following payload:
   ```json
      {
-        "sourceAccount": <the account id where the money is sent from>,
-        "destinationAccount": <the account id receiving the money>,
-        "amount": <the transaction amount, e.g. 5.34>
+        "sourceAccount": "<the account id where the money is sent from>",
+        "destinationAccount": "<the account id receiving the money>",
+        "amount": "<the transaction amount, e.g. 5.34>"
      }
   ```
   - Example: 
