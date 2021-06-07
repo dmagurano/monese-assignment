@@ -54,4 +54,13 @@
             referencedTableName="Account"/>
     </changeSet>
 
+    <changeSet id="3" author="daniele.magurano">
+        <createIndex indexName="source_index" tableName="Transaction">
+            <column name="Source"/>
+        </createIndex>
+        <createIndex indexName="destination_index" tableName="Transaction">
+            <column name="Destination"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
