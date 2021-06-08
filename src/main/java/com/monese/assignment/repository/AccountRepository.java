@@ -20,9 +20,9 @@ public class AccountRepository {
             .addValue("accountId", accountId);
 
         try {
-            return jdbcTemplate.queryForObject("SELECT Id, Balance   " +
-                                                   "FROM Account         " +
-                                                   "WHERE Id = :accountId",
+            return jdbcTemplate.queryForObject("SELECT Id, Balance          " +
+                                                   "FROM Account  WITH (UPDLOCK) " +
+                                                   "WHERE Id = :accountId        ",
                                                params,
                                                (rs, i) -> new Account(
                                                    rs.getInt("Id"),
